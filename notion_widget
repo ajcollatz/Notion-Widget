@@ -1,0 +1,225 @@
+<!-- Save this file as index.html and deploy to Netlify / Vercel / GitHub Pages / Cloudflare Pages -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Greeting Widget — AJ</title>
+
+  <!-- Work Sans -->
+  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg: #0f1724;
+      --card: #0b1220;
+      --accent: #6ee7b7;
+      --muted: #97a0b3;
+      --soft: #c4cbd9;
+    }
+    *{box-sizing:border-box}
+    html,body{
+      height:100%;
+      margin:0;
+      font-family:"Work Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    body{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(180deg,var(--bg),#08101a 80%);
+      padding:16px;
+      color:#e6eef8;
+    }
+    .widget{
+      width:min(520px,92vw);
+      background:linear-gradient(180deg,var(--card), rgba(11,18,32,0.9));
+      border-radius:16px;
+      padding:20px;
+      box-shadow:0 10px 30px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+      display:flex;
+      gap:16px;
+      align-items:center;
+    }
+    .avatar{
+      min-width:64px;
+      min-height:64px;
+      height:64px;
+      width:64px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      font-weight:700;
+      font-size:22px;
+      color:#052018;
+      background: linear-gradient(135deg,var(--accent) 0%, #34d399 100%);
+      box-shadow: 0 4px 14px rgba(52,211,153,0.18);
+      flex-shrink:0;
+    }
+    .text {
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:0;
+    }
+    .greeting{
+      font-size:20px;
+      font-weight:600;
+      line-height:1;
+    }
+    .date-line{
+      font-size:14px;
+      color:var(--muted);
+      margin-top:4px;
+    }
+    .affirmation{
+      font-size:14px;
+      color:var(--soft);
+      margin-top:6px;
+      font-weight:400;
+      opacity:0.95;
+    }
+
+    @media (max-width:420px){
+      .widget{padding:14px}
+      .greeting{font-size:18px}
+      .avatar{height:56px;width:56px;font-size:18px}
+    }
+  </style>
+</head>
+<body>
+  <main class="widget" role="region" aria-label="Greeting for AJ">
+    <div class="avatar" aria-hidden="true">AJ</div>
+    <div class="text">
+      <div class="greeting" id="greeting">Good morning, AJ</div>
+      <div class="date-line" id="dateLine">Today is …</div>
+      <div class="affirmation" id="affirmation">You are capable of amazing things.</div>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      const name = "AJ";
+      const timeZone = "America/New_York";
+
+      // Affirmations list (edit to your liking)
+      const affirmations = [
+        "You are capable of amazing things.",
+        "You deserve peace and clarity today.",
+        "Your presence makes a difference.",
+        "You are growing in the right direction.",
+        "You have everything you need within you.",
+        "You are allowed to take up space.",
+        "You are doing better than you think.",
+        "Today is full of possibilities for you.",
+        "You radiate creativity and purpose.",
+        "You can handle whatever today brings.",
+        "You deserve joy, ease, and abundance.",
+        "You are becoming who you’re meant to be.",
+        "Your work and effort matter.",
+        "You are worthy of good things.",
+        "You bring value everywhere you go."
+      ];
+
+      const greetingEl = document.getElementById("greeting");
+      const dateLineEl = document.getElementById("dateLine");
+      const affirmationEl = document.getElementById("affirmation");
+
+      // Returns {year, month, day} for the given Date in ET
+      function getETDateParts(date) {
+        const parts = new Intl.DateTimeFormat("en-US", {
+          timeZone,
+          year: "numeric",
+          month: "numeric",
+          day: "numeric"
+        }).formatToParts(date);
+
+        let year, month, day;
+        for (const p of parts) {
+          if (p.type === "year") year = parseInt(p.value, 10);
+          if (p.type === "month") month = parseInt(p.value, 10);
+          if (p.type === "day") day = parseInt(p.value, 10);
+        }
+        return { year, month, day };
+      }
+
+      // Get hour (0-23) in ET for greeting
+      function getETHour(date) {
+        const parts = new Intl.DateTimeFormat("en-US", {
+          timeZone,
+          hour: "numeric",
+          hour12: false
+        }).formatToParts(date);
+
+        for (const p of parts) {
+          if (p.type === "hour") return parseInt(p.value, 10);
+        }
+        // Fallback
+        return new Date().getHours();
+      }
+
+      function formatWithOrdinal(n) {
+        const v = n % 100;
+        if (v >= 11 && v <= 13) return n + "th";
+        switch (n % 10) {
+          case 1: return n + "st";
+          case 2: return n + "nd";
+          case 3: return n + "rd";
+          default: return n + "th";
+        }
+      }
+
+      // Returns formatted "Today is Month DayOrdinal, Year"
+      function formatFullDateET(date) {
+        const parts = new Intl.DateTimeFormat("en-US", {
+          timeZone,
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        }).formatToParts(date);
+
+        let month, day, year;
+        for (const p of parts) {
+          if (p.type === "month") month = p.value;
+          if (p.type === "day") day = parseInt(p.value, 10);
+          if (p.type === "year") year = p.value;
+        }
+        return `Today is ${month} ${formatWithOrdinal(day)}, ${year}`;
+      }
+
+      // Deterministic daily index based on the ET date (days since epoch)
+      function getDayIndexFromET(date) {
+        const { year, month, day } = getETDateParts(date);
+        // Use UTC midnight for that ET date to produce consistent day index
+        const utcMillis = Date.UTC(year, month - 1, day);
+        return Math.floor(utcMillis / 86400000);
+      }
+
+      function getDailyAffirmation(date) {
+        const dayIndex = getDayIndexFromET(date);
+        return affirmations[Math.abs(dayIndex) % affirmations.length];
+      }
+
+      function update() {
+        const now = new Date();
+
+        // Greeting
+        const hourET = getETHour(now);
+        const greeting = (hourET < 12) ? "Good morning" : "Good afternoon";
+        greetingEl.textContent = `${greeting}, ${name}`;
+
+        // Date line
+        dateLineEl.textContent = formatFullDateET(now);
+
+        // Affirmation
+        affirmationEl.textContent = getDailyAffirmation(now);
+      }
+
+      // Run immediately and refresh occasionally
+      update();
+      // Update every 60 seconds to catch day/greeting changes if page left open
+      setInterval(update, 60_000);
+    })();
+  </script>
+</body>
+</html>
