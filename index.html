@@ -45,4 +45,159 @@
       font-size:32px;
       flex-shrink:0;
     }
-    .t
+    .text {
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:0;
+    }
+    .greeting{
+      font-size:20px;
+      font-weight:600;
+      line-height:1;
+      color: var(--text-color);
+    }
+    .date-line{
+      font-size:14px;
+      color: var(--text-color);
+      margin-top:4px;
+    }
+    .affirmation{
+      font-size:14px;
+      color: var(--text-color);
+      margin-top:6px;
+      font-weight:400;
+      opacity:0.95;
+    }
+
+    @media (max-width:420px){
+      .widget{padding:14px}
+      .greeting{font-size:18px}
+      .avatar{height:56px;width:56px;font-size:28px}
+    }
+  </style>
+</head>
+<body>
+  <main class="widget" role="region" aria-label="Greeting for AJ">
+    <div class="avatar" aria-hidden="true">🌇</div>
+    <div class="text">
+      <div class="greeting" id="greeting">Good morning, AJ</div>
+      <div class="date-line" id="dateLine">Today is …</div>
+      <div class="affirmation" id="affirmation">Today's Intention 🍃: You are capable of amazing things.</div>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      const name = "AJ";
+      const timeZone = "America/New_York";
+
+      const affirmations = [
+        "You are capable of amazing things.",
+        "You deserve peace and clarity today.",
+        "Your presence makes a difference.",
+        "You are growing in the right direction.",
+        "You have everything you need within you.",
+        "You are allowed to take up space.",
+        "You are doing better than you think.",
+        "Today is full of possibilities for you.",
+        "You radiate creativity and purpose.",
+        "You can handle whatever today brings.",
+        "You deserve joy, ease, and abundance.",
+        "You are becoming who you’re meant to be.",
+        "Your work and effort matter.",
+        "You are worthy of good things.",
+        "You bring value everywhere you go."
+      ];
+
+      const greetingEl = document.getElementById("greeting");
+      const dateLineEl = document.getElementById("dateLine");
+      const affirmationEl = document.getElementById("affirmation");
+
+      function getETDateParts(date) {
+        const parts = new Intl.DateTimeFormat("en-US", {
+          timeZone,
+          year: "numeric",
+          month: "numeric",
+          day: "numeric"
+        }).formatToParts(date);
+
+        let year, month, day;
+        for (const p of parts) {
+          if (p.type === "year") year = parseInt(p.value, 10);
+          if (p.type === "month") month = parseInt(p.value, 10);
+          if (p.type === "day") day = parseInt(p.value, 10);
+        }
+        return { year, month, day };
+      }
+
+      function getETHour(date) {
+        const parts = new Intl.DateTimeFormat("en-US", {
+          timeZone,
+          hour: "numeric",
+          hour12: false
+        }).formatToParts(date);
+
+        for (const p of parts) {
+          if (p.type === "hour") return parseInt(p.value, 10);
+        }
+        return new Date().getHours();
+      }
+
+      function formatWithOrdinal(n) {
+        const v = n % 100;
+        if (v >= 11 && v <= 13) return n + "th";
+        switch (n % 10) {
+          case 1: return n + "st";
+          case 2: return n + "nd";
+          case 3: return n + "rd";
+          default: return n + "th";
+        }
+      }
+
+      function formatFullDateET(date) {
+        const parts = new Intl.DateTimeFormat("en-US", {
+          timeZone,
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        }).formatToParts(date);
+
+        let month, day, year;
+        for (const p of parts) {
+          if (p.type === "month") month = p.value;
+          if (p.type === "day") day = parseInt(p.value, 10);
+          if (p.type === "year") year = p.value;
+        }
+        return `Today is ${month} ${formatWithOrdinal(day)}, ${year}`;
+      }
+
+      function getDayIndexFromET(date) {
+        const { year, month, day } = getETDateParts(date);
+        const utcMillis = Date.UTC(year, month - 1, day);
+        return Math.floor(utcMillis / 86400000);
+      }
+
+      function getDailyAffirmation(date) {
+        const dayIndex = getDayIndexFromET(date);
+        return "Today's Intention 🍃: " + affirmations[Math.abs(dayIndex) % affirmations.length];
+      }
+
+      function update() {
+        const now = new Date();
+
+        const hourET = getETHour(now);
+        const greeting = (hourET < 12) ? "Good morning" : "Good afternoon";
+        greetingEl.textContent = `${greeting}, ${name}`;
+
+        dateLineEl.textContent = formatFullDateET(now);
+
+        affirmationEl.textContent = getDailyAffirmation(now);
+      }
+
+      update();
+      setInterval(update, 60_000);
+    })();
+  </script>
+</body>
+</html>
