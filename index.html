@@ -136,7 +136,7 @@
 
       function getDailyAffirmation(date){
         const dayIndex = getDayIndexFromET(date);
-        return "Today's Intention 🍃 "+affirmations[Math.abs(dayIndex)%affirmations.length];
+        return "Today's Intention 🍃: "+affirmations[Math.abs(dayIndex)%affirmations.length];
       }
 
       function update(){
