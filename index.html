@@ -63,9 +63,9 @@
   <div class="widget">
     <div class="avatar">🌇</div>
     <div class="text">
-      <div class="greeting" id="greeting">Good morning, AJ</div>
+      <div class="greeting" id="greeting">Good morning, AJ!</div>
       <div class="date-line" id="dateLine">Today is …</div>
-      <div class="affirmation" id="affirmation">Today's Intention 🍃: You are capable of amazing things.</div>
+      <div class="affirmation" id="affirmation">Today's Reminder 🍃: You are capable of amazing things.</div>
     </div>
   </div>
 
@@ -136,7 +136,7 @@
 
       function getDailyAffirmation(date){
         const dayIndex = getDayIndexFromET(date);
-        return "Today's Intention 🍃: "+affirmations[Math.abs(dayIndex)%affirmations.length];
+        return "Today's Reminder 🍃: "+affirmations[Math.abs(dayIndex)%affirmations.length];
       }
 
       function update(){
