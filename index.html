@@ -154,11 +154,21 @@
   } else if(hourET < 17){
     greetingText = "Good afternoon";
     avatarEmoji = "🌞";
-    bgColor = "#E6F7FF"; // light afternoon blue
+    bgColor = "#fff1e6"; // updated afternoon color
   } else {
     greetingText = "Good evening";
     avatarEmoji = "🌇";
     bgColor = "#F0E6FF"; // calm evening purple
+  }
+  
+  // Update the widget elements in the new order
+  greetingEl.textContent = greetingText + ", " + name;
+  document.querySelector('.avatar').textContent = avatarEmoji;
+  document.querySelector('.widget').style.background = bgColor;
+  affirmationEl.textContent = getDailyAffirmation(now);
+  dateLineEl.textContent = formatFullDateET(now);
+}
+
   }
   
   // Update the widget elements
