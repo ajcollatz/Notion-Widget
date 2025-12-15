@@ -139,13 +139,36 @@
         return "Today's Reminder 🍃: "+affirmations[Math.abs(dayIndex)%affirmations.length];
       }
 
-      function update(){
-        const now=new Date();
-        const hourET = getETHour(now);
-        greetingEl.textContent = (hourET<12?"Good morning":"Good afternoon")+", "+name;
-        dateLineEl.textContent = formatFullDateET(now);
-        affirmationEl.textContent = getDailyAffirmation(now);
-      }
+     function update(){
+  const now = new Date();
+  const hourET = getETHour(now);
+  
+  let greetingText;
+  let avatarEmoji;
+  let bgColor;
+
+  if(hourET < 12){
+    greetingText = "Good morning";
+    avatarEmoji = "🌅";
+    bgColor = "#FFF9E6"; // soft morning yellow
+  } else if(hourET < 17){
+    greetingText = "Good afternoon";
+    avatarEmoji = "🌞";
+    bgColor = "#E6F7FF"; // light afternoon blue
+  } else {
+    greetingText = "Good evening";
+    avatarEmoji = "🌇";
+    bgColor = "#F0E6FF"; // calm evening purple
+  }
+  
+  // Update the widget elements
+  greetingEl.textContent = greetingText + ", " + name;
+  document.querySelector('.avatar').textContent = avatarEmoji;
+  document.querySelector('.widget').style.background = bgColor;
+  dateLineEl.textContent = formatFullDateET(now);
+  affirmationEl.textContent = getDailyAffirmation(now);
+}
+
 
       update();
       setInterval(update,60000);
