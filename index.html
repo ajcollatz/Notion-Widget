@@ -20,13 +20,13 @@
     .widget {
       display: flex;
       align-items: center;
-      gap: 16px;
-      background: #fdfdfd; /* light button background */
+      gap: 20px;
+      background: #fdfdfd; /* will be overwritten by JS */
       border-radius: 12px;
-      padding: 20px 24px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* subtle shadow */
+      padding: 24px 28px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       border: 1px solid rgba(0,0,0,0.1);
-      cursor: pointer; /* make it feel clickable */
+      cursor: pointer;
       transition: transform 0.1s ease, box-shadow 0.2s ease;
       max-width: 520px;
       width: 92vw;
@@ -38,24 +38,29 @@
     }
 
     .avatar {
-      font-size: 32px;
+      font-size: 40px;
       flex-shrink: 0;
     }
 
     .text {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 12px;
     }
 
     .greeting {
-      font-weight: 600;
+      font-weight: 700;
+      font-size: 28px;
+    }
+
+    .affirmation {
+      font-weight: 500;
       font-size: 20px;
     }
 
-    .date-line, .affirmation {
-      font-size: 14px;
+    .date-line {
       font-weight: 400;
+      font-size: 16px;
     }
   </style>
 </head>
@@ -64,8 +69,8 @@
     <div class="avatar">🌇</div>
     <div class="text">
       <div class="greeting" id="greeting">Good morning, AJ!</div>
-      <div class="date-line" id="dateLine">Today is …</div>
       <div class="affirmation" id="affirmation">Today's Reminder 🍃: You are capable of amazing things.</div>
+      <div class="date-line" id="dateLine">Today is …</div>
     </div>
   </div>
 
@@ -94,17 +99,8 @@
       const greetingEl = document.getElementById("greeting");
       const dateLineEl = document.getElementById("dateLine");
       const affirmationEl = document.getElementById("affirmation");
-
-      function getETDateParts(date){
-        const parts = new Intl.DateTimeFormat("en-US", {timeZone, year:'numeric', month:'numeric', day:'numeric'}).formatToParts(date);
-        let year, month, day;
-        for(const p of parts){
-          if(p.type==='year') year=parseInt(p.value,10);
-          if(p.type==='month') month=parseInt(p.value,10);
-          if(p.type==='day') day=parseInt(p.value,10);
-        }
-        return {year, month, day};
-      }
+      const avatarEl = document.querySelector('.avatar');
+      const widgetEl = document.querySelector('.widget');
 
       function getETHour(date){
         const parts = new Intl.DateTimeFormat("en-US",{timeZone,hour:'numeric',hour12:false}).formatToParts(date);
@@ -130,7 +126,13 @@
       }
 
       function getDayIndexFromET(date){
-        const {year, month, day} = getETDateParts(date);
+        const parts = new Intl.DateTimeFormat("en-US",{timeZone,year:'numeric',month:'numeric',day:'numeric'}).formatToParts(date);
+        let year, month, day;
+        for(const p of parts){
+          if(p.type==='year') year=parseInt(p.value,10);
+          if(p.type==='month') month=parseInt(p.value,10);
+          if(p.type==='day') day=parseInt(p.value,10);
+        }
         return Math.floor(Date.UTC(year, month-1, day)/86400000);
       }
 
@@ -139,50 +141,12 @@
         return "Today's Reminder 🍃: "+affirmations[Math.abs(dayIndex)%affirmations.length];
       }
 
-     function update(){
-  const now = new Date();
-  const hourET = getETHour(now);
-  
-  let greetingText;
-  let avatarEmoji;
-  let bgColor;
+      function update(){
+        const now = new Date();
+        const hourET = getETHour(now);
 
-  if(hourET < 12){
-    greetingText = "Good morning";
-    avatarEmoji = "🌅";
-    bgColor = "#FFF9E6"; // soft morning yellow
-  } else if(hourET < 17){
-    greetingText = "Good afternoon";
-    avatarEmoji = "🌞";
-    bgColor = "#fff1e6"; // updated afternoon color
-  } else {
-    greetingText = "Good evening";
-    avatarEmoji = "🌇";
-    bgColor = "#F0E6FF"; // calm evening purple
-  }
-  
-  // Update the widget elements in the new order
-  greetingEl.textContent = greetingText + ", " + name;
-  document.querySelector('.avatar').textContent = avatarEmoji;
-  document.querySelector('.widget').style.background = bgColor;
-  affirmationEl.textContent = getDailyAffirmation(now);
-  dateLineEl.textContent = formatFullDateET(now);
-}
+        let greetingText, avatarEmoji, bgColor;
 
-  }
-  
-  // Update the widget elements
-  greetingEl.textContent = greetingText + ", " + name;
-  document.querySelector('.avatar').textContent = avatarEmoji;
-  document.querySelector('.widget').style.background = bgColor;
-  dateLineEl.textContent = formatFullDateET(now);
-  affirmationEl.textContent = getDailyAffirmation(now);
-}
-
-
-      update();
-      setInterval(update,60000);
-    })();
-  </script>
-</body>
-</html>
+        if(hourET < 12){
+          greetingText = "Good morning";
+          avatarEmoji =
