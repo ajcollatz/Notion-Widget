@@ -115,13 +115,10 @@
       }
 
       function formatFullDateET(date){
-        const parts = new Intl.DateTimeFormat("en-US",{timeZone,year:'numeric',month:'long',day:'numeric'}).formatToParts(date);
-        let month, day, year;
-        for(const p of parts){
-          if(p.type==='month') month=p.value;
-          if(p.type==='day') day=parseInt(p.value,10);
-          if(p.type==='year') year=p.value;
-        }
+        const options = { timeZone: timeZone, year: 'numeric', month: 'long', day: 'numeric' };
+        const formatted = date.toLocaleDateString('en-US', options);
+        const [month, dayStr, year] = formatted.replace(',', '').split(' ');
+        const day = parseInt(dayStr, 10);
         return `Today is ${month} ${formatWithOrdinal(day)}, ${year}`;
       }
 
@@ -149,4 +146,17 @@
 
         if(hourET < 12){
           greetingText = "Good morning";
-          avatarEmoji =
+          avatarEmoji = "🌅";
+          bgColor = "#FFF9E6";
+        } else if(hourET < 17){
+          greetingText = "Good afternoon";
+          avatarEmoji = "🌞";
+          bgColor = "#fff1e6";
+        } else {
+          greetingText = "Good evening";
+          avatarEmoji = "🌇";
+          bgColor = "#F0E6FF";
+        }
+
+        // Update widget content
+        greetingEl.textContent = greetingTe
