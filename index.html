@@ -137,7 +137,7 @@
 
       function getDailyAffirmation(date) {
         const index = Math.floor(date.getTime() / 86400000);
-        return `Today's Reminder 🍃: ${
+        return `Today's Reminder: ${
           affirmations[index % affirmations.length]
         }`;
       }
